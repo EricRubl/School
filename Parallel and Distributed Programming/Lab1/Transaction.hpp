@@ -1,15 +1,18 @@
-#include <utility>
+//
+// Created by Eric on 02.10.2018.
+//
 
 #ifndef PARALLEL_AND_DISTRIBUTED_PROGRAMMING_TRANSACTION_HPP
 #define PARALLEL_AND_DISTRIBUTED_PROGRAMMING_TRANSACTION_HPP
 
 #include <chrono>
 #include <utility>
-#include <iostream>
+#include <ostream>
+#include <thread>
 
 namespace Lab1
 {
-    using TransactionID = std::pair<unsigned int, unsigned short int>;
+    using TransactionID = std::pair<unsigned short int, unsigned short int>;
 
     class Transaction
     {
@@ -18,7 +21,7 @@ namespace Lab1
         unsigned short int from;
         unsigned short int to;
         unsigned short int amount;
-        std::chrono::duration<double> duration;
+        std::chrono::milliseconds duration;
     public:
         Transaction() : id(), from(), to(), amount(), duration()
         {};
@@ -28,11 +31,10 @@ namespace Lab1
         {};
 
         Transaction(TransactionID id, const unsigned short int& from, const unsigned short int& to,
-                    const unsigned short int& amount, const std::chrono::duration<double>& duration) : id(
-                std::move(id)),
-                from(from), to(to), amount(amount), duration(duration)
+                    const unsigned short int& amount, const std::chrono::milliseconds duration) : id(std::move(id)),
+                    from(from), to(to), amount(amount), duration(duration)
         {
-            if (id.first < 0 || id.second < 0 || from < 0 || to < 0 || amount < 0)
+            if(id.first < 0 || id.second < 0 || from < 0 || to < 0 || amount < 0 || duration.count() < 0)
                 throw "Transaction initialised with invalid parameters!";
         };
 
@@ -59,14 +61,34 @@ namespace Lab1
             return amount;
         }
 
-        const std::chrono::duration<double>& getDuration() const
+        void setDuration(const std::chrono::milliseconds& duration)
+        {
+            this->duration = duration;
+        }
+
+        const std::chrono::milliseconds& getDuration() const
         {
             return duration;
         }
 
         friend std::ostream& operator<<(std::ostream& output, const Transaction& transaction)
         {
-            output << "Thread " << id.second;
+            std::string print;
+
+            print = "Thread ";
+            print += std::to_string(transaction.id.second);
+            print += " | ";
+            print += std::to_string(transaction.from);
+            print += " --> ";
+            print += std::to_string(transaction.amount);
+            print += "$ --> ";
+            print += std::to_string(transaction.to);
+            print += " | ";
+            print += std::to_string(transaction.duration.count());
+            print += "ms\n";
+
+            output << print;
+
             return output;
         }
     };

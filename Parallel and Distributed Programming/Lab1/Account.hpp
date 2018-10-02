@@ -1,34 +1,53 @@
+//
+// Created by Eric on 02.10.2018.
+//
 
 #ifndef PARALLEL_AND_DISTRIBUTED_PROGRAMMING_ACCOUNT_HPP
 #define PARALLEL_AND_DISTRIBUTED_PROGRAMMING_ACCOUNT_HPP
 
+#include "Transaction.hpp"
+
 #include <vector>
 #include <utility>
-#include "Transaction.hpp"
+#include <ostream>
 
 namespace Lab1
 {
     class Account
     {
     private:
+        unsigned short int id;
         unsigned long long balance;
         std::vector<Transaction> transactions;
 
     public:
-        Account() : balance(), transactions()
+        Account() : id(), balance(), transactions()
         {};
 
-        Account(const Account& other) : balance(other.getBalance()), transactions(other.getTransactions())
+        Account(const Account& other) : id(other.getId()), balance(other.getBalance()), transactions(
+                other.getTransactions())
         {};
 
-        explicit Account(const unsigned long long& balance) : balance(balance), transactions()
-        {};
+        explicit Account(const unsigned short int& id, const unsigned long long& balance) : id(id), balance(balance),
+                transactions()
+        {
+            if(balance < 0)
+                throw "Account initialised with invalid parameters!";
+        };
 
-        Account(const unsigned long long& balance, std::vector<Transaction> transactions) : balance(balance),
-                transactions(std::move(transactions))
-        {};
+        Account(const unsigned short int& id, const unsigned long long& balance, std::vector<Transaction> transactions)
+                : id(id), balance(balance), transactions(std::move(transactions))
+        {
+            if(balance < 0)
+                throw "Account initialised with invalid parameters!";
+        };
 
         ~Account() = default;
+
+        unsigned short int getId() const
+        {
+            return id;
+        }
 
         unsigned long long int getBalance() const
         {
@@ -38,6 +57,11 @@ namespace Lab1
         const std::vector<Transaction>& getTransactions() const
         {
             return transactions;
+        }
+
+        void addTransaction(const Transaction& transaction) noexcept
+        {
+            this->transactions.push_back(transaction);
         }
 
         Account& operator+=(const int& value)
@@ -52,35 +76,18 @@ namespace Lab1
             return *this;
         }
 
-        Account& operator++()
+        friend std::ostream& operator<<(std::ostream& output, const Account& account)
         {
-            ++(this->balance);
-            return *this;
-        }
+            std::string print;
 
-        const Account operator++(int)
-        {
-            Account old = *this;
-            ++(*this);
-            return old;
-        }
+            print = std::to_string(account.id);
+            print += " | ";
+            print += std::to_string(account.balance);
+            print += "$\n";
 
-        Account& operator--()
-        {
-            --(this->balance);
-            return *this;
-        }
+            output << print;
 
-        const Account operator--(int)
-        {
-            Account old = *this;
-            --(*this);
-            return old;
-        }
-
-        void addTransaction(const Transaction& transaction)
-        {
-            this->transactions.push_back(transaction);
+            return output;
         }
     };
 }
