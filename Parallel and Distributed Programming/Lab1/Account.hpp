@@ -10,73 +10,77 @@
 #include <vector>
 #include <utility>
 #include <ostream>
+#include <mutex>
 
 namespace Lab1
 {
     class Account
     {
     private:
-        unsigned short int id;
-        unsigned long long balance;
+        unsigned short id;
+        long long balance;
+        long long initialBalance;
         std::vector<Transaction> transactions;
+        std::mutex mutex;
 
     public:
-        Account() : id(), balance(), transactions()
-        {};
+        Account() : id(), balance(), initialBalance(), transactions(), mutex()
+        {}
 
-        Account(const Account& other) : id(other.getId()), balance(other.getBalance()), transactions(
-                other.getTransactions())
-        {};
+        Account(const Account& other) : id(other.id), balance(other.balance), initialBalance(other.initialBalance),
+                transactions(other.transactions), mutex()
+        {}
 
-        explicit Account(const unsigned short int& id, const unsigned long long& balance) : id(id), balance(balance),
-                transactions()
-        {
-            if(balance < 0)
-                throw "Account initialised with invalid parameters!";
-        };
-
-        Account(const unsigned short int& id, const unsigned long long& balance, std::vector<Transaction> transactions)
-                : id(id), balance(balance), transactions(std::move(transactions))
-        {
-            if(balance < 0)
-                throw "Account initialised with invalid parameters!";
-        };
+        Account(const unsigned short &id, const long long &initialBalance) : id(id),
+                balance(initialBalance), transactions(), initialBalance(initialBalance), mutex()
+        {}
 
         ~Account() = default;
 
-        unsigned short int getId() const
+        unsigned short getId() const
         {
             return id;
-        }
+        };
 
-        unsigned long long int getBalance() const
+        void lock()
         {
-            return balance;
+            return mutex.lock();
         }
 
-        const std::vector<Transaction>& getTransactions() const
+        void unlock()
         {
-            return transactions;
+            mutex.unlock();
         }
 
-        void addTransaction(const Transaction& transaction) noexcept
+        int try_lock()
         {
-            this->transactions.push_back(transaction);
+            return mutex.try_lock();
         }
 
-        Account& operator+=(const int& value)
+        void addTransaction(const Transaction &transaction)
         {
-            this->balance += value;
-            return *this;
+            if(transaction.getFrom() == id)
+                balance -= transaction.getAmount();
+            else if(transaction.getTo() == id)
+                balance += transaction.getAmount();
+
+            transactions.push_back(transaction);
         }
 
-        Account& operator-=(const int& value)
+        bool isValid() const
         {
-            this->balance -= value;
-            return *this;
+            auto expectedBalance = initialBalance;
+
+            for(const auto &transaction : transactions)
+                if(transaction.getFrom() == id)
+                    expectedBalance -= transaction.getAmount();
+                else
+                    expectedBalance += transaction.getAmount();
+
+            return expectedBalance == balance;
         }
 
-        friend std::ostream& operator<<(std::ostream& output, const Account& account)
+        friend std::ostream &operator<<(std::ostream &output, const Account &account)
         {
             std::string print;
 
