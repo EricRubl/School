@@ -1,14 +1,21 @@
-#include "Lab1/Randomizer.hpp"
+#include "Lab1/BankExecutor.hpp"
 
 #include <iostream>
 
 int main()
 {
-    std::random_device rd;
-    std::cout << rd.entropy() << '\n';
-    for(int i = 0; i < 5; ++i)
-
-        std::cout << Lab1::generateRandomNumber(17, 66) << std::endl;
+    try
+    {
+        for(unsigned short threadCount = 1; threadCount <= 4; ++threadCount)
+        {
+            auto bankExecutor = Lab1::BankExecutor(threadCount, 60000, 1000000, std::chrono::seconds(5));
+            bankExecutor.start();
+        }
+    }
+    catch(char const* exception)
+    {
+        std::cerr << exception << '\n';
+    }
 
     return 0;
 }   

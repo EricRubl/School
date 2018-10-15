@@ -14,20 +14,15 @@
 
 namespace Lab1
 {
-    int generateRandomNumber(int low, int high)
+    static int generateRandomNumber(int low, int high)
     {
         auto time = std::time(nullptr);
+
         std::mt19937 gen(static_cast<unsigned int>(rand() + time));
+
         std::uniform_int_distribution<> uniformDistribution(low, high);
 
         return uniformDistribution(gen);
-    }
-
-
-
-    static const Transaction& generateRandomTransaction(const std::vector<Account>& accounts)
-    {
-
     }
 }
 
