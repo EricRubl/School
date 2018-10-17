@@ -1,0 +1,19 @@
+Normalized integers
+-------------------
+
+BNF
+----
+normint ::= <sign><int> | <int>
+int ::= <dig>|<dig><number>
+number ::= <null_dig><number>
+null_dig ::= "0" | dig
+dig ::= "1" | ... | "9"
+sign ::= "-" | "+"
+
+EBNF
+----
+normint = [sign]int
+int = dig[number]
+number = null_dig[number]
+null_dig = "0" | dig
+dig = 1 | ... | 9
