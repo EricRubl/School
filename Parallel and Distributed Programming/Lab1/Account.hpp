@@ -33,10 +33,7 @@ namespace Lab1
 
         Account(const unsigned short &id, const long long &initialBalance) : id(id),
                 balance(initialBalance), transactions(), initialBalance(initialBalance), mutex()
-        {
-            if(balance < 0)
-                throw "Account initialised with invalid parameters!\n";
-        };
+        {}
 
         ~Account() = default;
 
@@ -60,14 +57,12 @@ namespace Lab1
             return mutex.try_lock();
         }
 
-        void addTransaction(const Transaction &transaction) noexcept
+        void addTransaction(const Transaction &transaction)
         {
             if(transaction.getFrom() == id)
                 balance -= transaction.getAmount();
             else if(transaction.getTo() == id)
                 balance += transaction.getAmount();
-            else
-                throw "Invalid transaction\n";
 
             transactions.push_back(transaction);
         }
