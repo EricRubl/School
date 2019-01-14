@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from lexer import  ParseError
+from lexer import ParseError
 from minilang import make_minilang_parser, make_minilang_lexer
 from tests.utils import remove_space_tokens
 
@@ -76,12 +76,3 @@ class TestMinilang(TestCase):
         """
         parser.parse(lexer.lex_with_names(test_prog))
         self.assertTrue(parser.is_parsed)
-
-
-        # should not work
-        test_prog = ['void', 'IDENTIFIER', '(', 'int', 'IDENTIFIER', ',', 'int', 'IDENTIFIER', '[', 'CONSTANT', ']',
-                     ')', '{', 'int', 'IDENTIFIER', '=', 'CONSTANT', ',', 'IDENTIFIER', '=', 'IDENTIFIER', ';', 'while',
-                     '(', 'IDENTIFIER', '<', ')', '{', 'IDENTIFIER', '=', 'IDENTIFIER', '+', 'IDENTIFIER',
-                     ';', 'IDENTIFIER', '=', 'IDENTIFIER', ';', '}', 'return', 'CONSTANT', ';', '}']
-        parser.parse(test_prog)
-        self.assertFalse(parser.is_parsed)
