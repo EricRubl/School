@@ -39,7 +39,7 @@ public class MemoryRepo
 
     public void delete(Entry entry) throws Exception
     {
-        if(entries.stream().noneMatch(e -> e.equals(entry)))
+        if(entries.stream().noneMatch(e -> e.getAccount().equals(entry.getAccount())))
         {
             throw new Exception("Entry does not exist!");
         }
@@ -49,6 +49,13 @@ public class MemoryRepo
 
     public Entry get(String account) throws Exception
     {
-        return databaseRepo.getEntry(account);
+        try
+        {
+            return databaseRepo.getEntry(account);
+        } catch (Exception e)
+        {
+            throw new Exception("Entry does not exist!");
+        }
+
     }
 }

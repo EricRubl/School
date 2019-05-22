@@ -1,6 +1,7 @@
 package View;
 
 import Controller.Controller;
+import Model.Entry;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -15,31 +16,22 @@ class CommandMenu
     static
     {
         syntaxList.add(Pattern.compile("^\\s*(add)\\s*([0-9a-zA-Z]+)\\s*([0-9a-zA-Z]+)\\s*$"));
+        syntaxList.add(Pattern.compile("^\\s*(update)\\s*([0-9a-zA-Z]+)\\s*([0-9a-zA-Z]+)\\s*$"));
         syntaxList.add(Pattern.compile("^\\s*(get)\\s*([0-9a-zA-Z]+)\\s*$"));
+        syntaxList.add(Pattern.compile("^\\s*(delete)\\s*([0-9a-zA-Z]+)\\s*$"));
+        syntaxList.add(Pattern.compile("^\\s*(login)\\s*([0-9a-zA-Z]+)\\s*$"));
+        syntaxList.add(Pattern.compile("^\\s*(logout)\\s*$"));
     }
 
     CommandMenu()
     {
         this.commandSet = new HashMap<>();
         this.controller = new Controller();
-        controller.setAuthentication(true);
     }
 
     void addCommand(Command command)
     {
         this.commandSet.put(command.getKey(), command);
-    }
-
-    private <T> void printArrayList(List<T> list)
-    {
-        if (list == null)
-        {
-            return;
-        }
-        for (T i : list)
-        {
-            System.out.println(i);
-        }
     }
 
 
@@ -51,19 +43,36 @@ class CommandMenu
             {
                 case "add":
                 {
-                    break;
+                    controller.add(new Entry(arguments.get(1), arguments.get(2)));
+                    return;
                 }
                 case "delete":
                 {
-                    break;
+                    controller.delete(new Entry(arguments.get(1), ""));
+                    return;
                 }
                 case "update":
                 {
-                    break;
+                    controller.update(new Entry(arguments.get(1), arguments.get(2)));
                 }
                 case "get":
                 {
                     System.out.println(controller.get(arguments.get(1)));
+                    return;
+                }
+                case "login":
+                {
+                    if(arguments.get(1).equals("secret"))
+                    {
+                        controller.setAuthentication(true);
+                        return;
+                    }
+                    throw new Exception("Incorrect password");
+                }
+                case "logout":
+                {
+                    controller.setAuthentication(false);
+                    return;
                 }
             }
         }

@@ -12,7 +12,6 @@ public class CachingBroker
     @Around("execution(* Repository.MemoryRepo.get(..)) && args(account)")
     public Entry getDB(ProceedingJoinPoint joinPoint, String account) throws Throwable
     {
-
         MemoryRepo memoryRepo = (MemoryRepo) joinPoint.getTarget();
         Optional<Entry> found = memoryRepo.entries.stream().filter(e -> e.getAccount().equals(account)).findFirst();
 
@@ -25,6 +24,5 @@ public class CachingBroker
             memoryRepo.entries.add(entry);
             return entry;
         }
-
     }
 }
